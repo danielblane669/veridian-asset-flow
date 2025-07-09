@@ -101,13 +101,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      // Sign up with auto-confirm for instant login
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             full_name: fullName,
           },
+          emailRedirectTo: `${window.location.origin}/dashboard`
         },
       });
 
@@ -115,6 +117,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         console.error('Signup error:', error);
         return false;
       }
+
+      // If user is immediately available (auto-confirm is enabled), return success
+      if (data.user && !data.user.email_confirmed_at) {
+        // For projects with email confirmation disabled, the user will be automatically logged in
+        return true;
+      } else if (data.user && data.user.email_confirmed_at) {
+        // User is confirmed and logged in
+        return true;
+      }
+
       return true;
     } catch (error) {
       console.error('Signup error:', error);

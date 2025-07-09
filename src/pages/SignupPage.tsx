@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -67,8 +66,7 @@ const SignupPage = () => {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
+          <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Full Name
               </label>
@@ -135,8 +133,6 @@ const SignupPage = () => {
                 placeholder="Confirm your password"
               />
             </div>
-          </div>
-
           <div>
             <button
               type="submit"

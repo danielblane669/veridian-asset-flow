@@ -7,29 +7,29 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-green-600 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-white text-white">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
               Invest in Crypto with
-              <span className="block bg-gradient-to-r from-yellow-400 to-green-400 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
                 Veridian Assets
               </span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto animate-fade-in">
+            <p className="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto animate-fade-in">
               Your trusted partner for cryptocurrency investments. Start building your digital wealth today with our secure and user-friendly platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-yellow-400 to-green-500 text-gray-900 px-8 py-4 rounded-lg font-semibold text-lg hover:from-yellow-300 hover:to-green-400 transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-purple-400 to-white text-purple-900 px-8 py-4 rounded-lg font-semibold text-lg hover:from-purple-300 hover:to-gray-100 transition-all duration-300 transform hover:scale-105"
               >
                 Start Investing Now
               </Link>
               <Link
                 to="/login"
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-900 transition-all duration-300"
+                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-900 transition-all duration-300"
               >
                 Login to Account
               </Link>
@@ -51,24 +51,24 @@ const LandingPage = () => {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">1</span>
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl font-bold text-purple-900">1</span>
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Create Account</h3>
               <p className="text-gray-600 dark:text-gray-300">Sign up for free and verify your identity to get started with secure crypto investing.</p>
             </div>
             
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">2</span>
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl font-bold text-purple-900">2</span>
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Fund Your Account</h3>
               <p className="text-gray-600 dark:text-gray-300">Deposit funds using various cryptocurrencies with minimum deposit of $200.</p>
             </div>
             
             <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-white">3</span>
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                <span className="text-2xl font-bold text-purple-900">3</span>
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Start Investing</h3>
               <p className="text-gray-600 dark:text-gray-300">Monitor your portfolio growth and withdraw your profits anytime with minimum withdrawal of $1,000.</p>
@@ -88,21 +88,21 @@ const LandingPage = () => {
               </p>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <Shield className="w-6 h-6 text-green-500" />
+                  <Shield className="w-6 h-6 text-purple-500" />
                   <span className="text-gray-700 dark:text-gray-300">Bank-level security and encryption</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-6 h-6 text-blue-500" />
+                  <TrendingUp className="w-6 h-6 text-purple-500" />
                   <span className="text-gray-700 dark:text-gray-300">Professional portfolio management</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <Zap className="w-6 h-6 text-yellow-500" />
+                  <Zap className="w-6 h-6 text-purple-500" />
                   <span className="text-gray-700 dark:text-gray-300">Fast and reliable transactions</span>
                 </div>
               </div>
             </div>
             <div className="lg:text-center">
-              <div className="bg-gradient-to-br from-blue-500 to-green-500 rounded-2xl p-8 text-white">
+              <div className="bg-gradient-to-br from-purple-500 to-white rounded-2xl p-8 text-purple-900">
                 <h3 className="text-2xl font-bold mb-4">Why Choose Us?</h3>
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
@@ -140,7 +140,7 @@ const LandingPage = () => {
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -153,7 +153,7 @@ const LandingPage = () => {
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -166,7 +166,7 @@ const LandingPage = () => {
             <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
               <div className="flex items-center mb-4">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
                 ))}
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -180,7 +180,7 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section id="faq" className="py-20 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h2>
@@ -221,24 +221,24 @@ const LandingPage = () => {
           
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-8 h-8 text-purple-900" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Email</h3>
               <p className="text-gray-600 dark:text-gray-300">support@veridianassets.com</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-8 h-8 text-purple-900" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Phone</h3>
               <p className="text-gray-600 dark:text-gray-300">+1 (555) 123-4567</p>
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
+                <MapPin className="w-8 h-8 text-purple-900" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Address</h3>
               <p className="text-gray-600 dark:text-gray-300">123 Crypto Street, Digital City, DC 12345</p>
@@ -253,8 +253,8 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">V</span>
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-white rounded-lg flex items-center justify-center">
+                  <span className="text-purple-900 font-bold text-sm">V</span>
                 </div>
                 <span className="text-xl font-bold">Veridian Assets</span>
               </div>
