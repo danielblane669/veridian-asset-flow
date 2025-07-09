@@ -19,22 +19,31 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ title, value, icon, gradi
     }).format(amount);
   };
 
+  // Override gradientColors to use purple theme
+  const purpleGradient = gradientColors.includes('blue') 
+    ? 'from-purple-600 to-purple-800' 
+    : gradientColors.includes('green') 
+    ? 'from-purple-500 to-purple-700'
+    : gradientColors.includes('yellow')
+    ? 'from-purple-400 to-purple-600'
+    : 'from-purple-700 to-purple-900';
+
   return (
-    <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${gradientColors} p-6 text-white shadow-lg hover:shadow-xl transition-shadow duration-300`}>
+    <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${purpleGradient} p-4 sm:p-6 text-white shadow-lg hover:shadow-xl transition-shadow duration-300`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
             {icon}
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium opacity-90">{title}</p>
             <div className="flex items-center space-x-2">
-              <p className="text-2xl font-bold">
+              <p className="text-xl sm:text-2xl font-bold truncate">
                 {isVisible ? formatCurrency(value) : '••••••'}
               </p>
               <button
                 onClick={() => setIsVisible(!isVisible)}
-                className="p-1 hover:bg-white/20 rounded-full transition-colors"
+                className="p-1 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
               >
                 {isVisible ? (
                   <EyeOff className="w-4 h-4" />

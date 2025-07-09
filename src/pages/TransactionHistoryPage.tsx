@@ -1,9 +1,22 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu, Filter, Download } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../integrations/supabase/client';
 import Sidebar from '../components/Dashboard/Sidebar';
 import MobileMenu from '../components/Dashboard/MobileMenu';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  currency: string;
+  hash: string | null;
+}
 
 const TransactionHistoryPage = () => {
   const { user } = useAuth();
@@ -11,24 +24,80 @@ const TransactionHistoryPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock transaction data
-  const allTransactions = [
-    { id: 1, type: 'Deposit', amount: 5000, status: 'Completed', date: '2024-01-15', time: '10:30 AM', currency: 'BTC', hash: 'abc123...def456' },
-    { id: 2, type: 'Bonus', amount: 500, status: 'Completed', date: '2024-01-14', time: '02:15 PM', currency: 'USD', hash: 'bonus001' },
-    { id: 3, type: 'Withdrawal', amount: 2000, status: 'Pending', date: '2024-01-13', time: '09:45 AM', currency: 'ETH', hash: 'ghi789...jkl012' },
-    { id: 4, type: 'Deposit', amount: 3000, status: 'Completed', date: '2024-01-12', time: '03:20 PM', currency: 'LTC', hash: 'mno345...pqr678' },
-    { id: 5, type: 'Withdrawal', amount: 1500, status: 'Completed', date: '2024-01-11', time: '11:00 AM', currency: 'XRP', hash: 'stu901...vwx234' },
-    { id: 6, type: 'Bonus', amount: 250, status: 'Completed', date: '2024-01-10', time: '04:30 PM', currency: 'USD', hash: 'bonus002' },
-    { id: 7, type: 'Deposit', amount: 7500, status: 'Completed', date: '2024-01-09', time: '08:15 AM', currency: 'BTC', hash: 'yza567...bcd890' },
-    { id: 8, type: 'Withdrawal', amount: 3500, status: 'Denied', date: '2024-01-08', time: '01:45 PM', currency: 'ETH', hash: 'efg123...hij456' },
-  ];
+  useEffect(() => {
+    if (user) {
+      fetchTransactions();
+    }
+  }, [user]);
 
-  const filteredTransactions = allTransactions.filter(transaction => {
+  const fetchTransactions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching transactions:', error);
+      } else {
+        setTransactions(data || []);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const filteredTransactions = transactions.filter(transaction => {
     const typeMatch = filterType === 'all' || transaction.type.toLowerCase() === filterType;
     const statusMatch = filterStatus === 'all' || transaction.status.toLowerCase() === filterStatus;
     return typeMatch && statusMatch;
   });
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Transaction History', 20, 20);
+    
+    // Add user info
+    doc.setFontSize(12);
+    doc.text(`User: ${user?.fullName || 'N/A'}`, 20, 35);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
+    
+    // Prepare table data
+    const tableData = filteredTransactions.map(transaction => [
+      transaction.type,
+      `$${transaction.amount.toLocaleString()}`,
+      transaction.currency,
+      transaction.status,
+      new Date(transaction.created_at).toLocaleDateString(),
+      transaction.hash || 'N/A'
+    ]);
+    
+    // Add table
+    (doc as any).autoTable({
+      head: [['Type', 'Amount', 'Currency', 'Status', 'Date', 'Transaction ID']],
+      body: tableData,
+      startY: 55,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [128, 90, 213], // Purple color
+        textColor: [255, 255, 255],
+      },
+    });
+    
+    // Save the PDF
+    doc.save(`transaction-history-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -50,11 +119,19 @@ const TransactionHistoryPage = () => {
       case 'Withdrawal':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       case 'Bonus':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -75,8 +152,8 @@ const TransactionHistoryPage = () => {
         {/* Mobile Header */}
         <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-sm">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-white rounded-lg flex items-center justify-center">
+              <span className="text-purple-800 font-bold text-sm">V</span>
             </div>
             <span className="text-lg font-bold text-gray-900 dark:text-white">Transactions</span>
           </div>
@@ -89,9 +166,9 @@ const TransactionHistoryPage = () => {
         </div>
 
         {/* Transaction History Content */}
-        <div className="p-6">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="p-4 sm:p-6">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-2">
               Transaction History
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
@@ -100,7 +177,7 @@ const TransactionHistoryPage = () => {
           </div>
 
           {/* Filters and Actions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <div className="flex items-center space-x-2">
@@ -108,7 +185,7 @@ const TransactionHistoryPage = () => {
                   <select
                     value={filterType}
                     onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white text-sm"
                   >
                     <option value="all">All Types</option>
                     <option value="deposit">Deposits</option>
@@ -120,7 +197,7 @@ const TransactionHistoryPage = () => {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white text-sm"
                 >
                   <option value="all">All Status</option>
                   <option value="completed">Completed</option>
@@ -129,9 +206,12 @@ const TransactionHistoryPage = () => {
                 </select>
               </div>
               
-              <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+              <button 
+                onClick={exportToPDF}
+                className="flex items-center justify-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors text-sm"
+              >
                 <Download className="w-4 h-4" />
-                <span>Export</span>
+                <span>Export PDF</span>
               </button>
             </div>
           </div>
@@ -142,22 +222,22 @@ const TransactionHistoryPage = () => {
               <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead className="bg-gray-50 dark:bg-gray-700">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Currency
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                      Date & Time
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                      Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                       Transaction ID
                     </th>
                   </tr>
@@ -165,30 +245,32 @@ const TransactionHistoryPage = () => {
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {filteredTransactions.map((transaction) => (
                     <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(transaction.type)}`}>
                           {transaction.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                        ${transaction.amount.toLocaleString()}
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        ${Number(transaction.amount).toLocaleString()}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {transaction.currency}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
                           {transaction.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         <div>
-                          <div>{transaction.date}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">{transaction.time}</div>
+                          <div>{new Date(transaction.created_at).toLocaleDateString()}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(transaction.created_at).toLocaleTimeString()}
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
-                        {transaction.hash}
+                      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
+                        {transaction.hash || 'N/A'}
                       </td>
                     </tr>
                   ))}
