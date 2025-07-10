@@ -19,7 +19,7 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-gradient-to-r from-white via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 shadow-lg transition-colors duration-300 fixed w-full top-0 z-50 backdrop-blur-sm">
+    <nav className="bg-gradient-to-r from-white/90 via-blue-50/90 to-purple-50/90 dark:from-gray-900/90 dark:via-blue-900/90 dark:to-purple-900/90 shadow-lg transition-colors duration-300 fixed w-full top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
