@@ -1,7 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
-import { User as SupabaseUser } from '@supabase/supabase-js';
+import { User as SupabaseUser, Session } from '@supabase/supabase-js';
 import { toast } from 'sonner';
 
 interface User {
@@ -16,6 +16,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (fullName: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -26,40 +27,69 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        fetchUserProfile(session.user);
-      } else {
-        setIsLoading(false);
-      }
-    });
-
-    // Listen for auth changes
+    console.log('Setting up auth state listener...');
+    
+    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      setSession(session);
+      
       if (session?.user) {
-        await fetchUserProfile(session.user);
+        // Defer profile fetching to prevent deadlocks
+        setTimeout(() => {
+          fetchUserProfile(session.user);
+        }, 0);
       } else {
         setUser(null);
         setIsLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.id);
+      setSession(session);
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserProfile(session.user);
+        }, 0);
+      } else {
+        setIsLoading(false);
+      }
+    });
+
+    return () => {
+      console.log('Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserProfile = async (authUser: SupabaseUser) => {
     try {
-      const { data: profile } = await supabase
+      console.log('Fetching profile for user:', authUser.id);
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', authUser.id)
         .single();
 
-      if (profile) {
+      if (error) {
+        console.error('Error fetching profile:', error);
+        // If profile doesn't exist, user still gets basic info
+        setUser({
+          id: authUser.id,
+          fullName: authUser.user_metadata?.full_name || 'User',
+          email: authUser.email || '',
+          totalPortfolio: 0,
+          profit: 0,
+          bonus: 0,
+          deposit: 0
+        });
+      } else if (profile) {
         setUser({
           id: authUser.id,
           fullName: profile.full_name,
@@ -71,7 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
       }
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error('Error in fetchUserProfile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -79,9 +109,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      console.log('Starting login process...');
+      setIsLoading(true);
+      console.log('Attempting login for:', email);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
@@ -92,28 +124,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       if (data.user) {
-        console.log('Login successful');
+        console.log('Login successful for user:', data.user.id);
         toast.success('Login successful!');
         return true;
       }
       
+      toast.error('Login failed - no user returned');
       return false;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login exception:', error);
       toast.error('Login failed. Please try again.');
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
     try {
-      console.log('Starting signup process...');
+      setIsLoading(true);
+      console.log('Attempting signup for:', email);
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
           data: {
-            full_name: fullName,
+            full_name: fullName.trim(),
           },
           emailRedirectTo: `${window.location.origin}/dashboard`
         },
@@ -126,26 +163,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.user) {
-        console.log('Signup successful');
-        toast.success('Account created successfully! Welcome to Veridian Assets. You have received a $100 welcome bonus!');
+        console.log('Signup successful for user:', data.user.id);
+        
+        // Check if email confirmation is needed
+        if (!data.session) {
+          toast.success('Please check your email to confirm your account!');
+        } else {
+          toast.success('Account created successfully! Welcome to Veridian Assets.');
+        }
         return true;
       }
 
+      toast.error('Signup failed - no user returned');
       return false;
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Signup exception:', error);
       toast.error('Signup failed. Please try again.');
       return false;
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+    try {
+      console.log('Logging out user');
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      toast.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Error logging out');
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

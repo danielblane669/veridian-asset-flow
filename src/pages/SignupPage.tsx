@@ -16,8 +16,25 @@ const SignupPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!fullName || !email || !password || !confirmPassword) {
-      toast.error('Please fill in all fields');
+    if (isSubmitting) return; // Prevent double submission
+    
+    if (!fullName.trim()) {
+      toast.error('Please enter your full name');
+      return;
+    }
+    
+    if (!email.trim()) {
+      toast.error('Please enter your email');
+      return;
+    }
+    
+    if (!password) {
+      toast.error('Please enter a password');
+      return;
+    }
+    
+    if (!confirmPassword) {
+      toast.error('Please confirm your password');
       return;
     }
 
@@ -32,13 +49,18 @@ const SignupPage = () => {
     }
 
     setIsSubmitting(true);
+    
     try {
-      const success = await signup(fullName, email, password);
+      console.log('Submitting signup form...');
+      const success = await signup(fullName.trim(), email.trim(), password);
+      
       if (success) {
+        console.log('Signup successful, navigating to dashboard');
         navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error('Signup form error:', error);
+      toast.error('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -68,7 +90,8 @@ const SignupPage = () => {
         </div>
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
+          <div className="space-y-4">
+            <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-foreground">
                 Full Name
               </label>
@@ -80,7 +103,8 @@ const SignupPage = () => {
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                disabled={isSubmitting}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50"
                 placeholder="Enter your full name"
               />
             </div>
@@ -97,7 +121,8 @@ const SignupPage = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                disabled={isSubmitting}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50"
                 placeholder="Enter your email"
               />
             </div>
@@ -114,7 +139,8 @@ const SignupPage = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                disabled={isSubmitting}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50"
                 placeholder="Enter your password"
               />
             </div>
@@ -131,10 +157,13 @@ const SignupPage = () => {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
+                disabled={isSubmitting}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-border placeholder-muted-foreground text-foreground bg-background rounded-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm disabled:opacity-50"
                 placeholder="Confirm your password"
               />
             </div>
+          </div>
+
           <div>
             <button
               type="submit"
