@@ -78,30 +78,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
         console.error('Login error:', error);
+        toast.error(error.message || 'Login failed');
         return false;
       }
-      return true;
+      
+      if (data.user) {
+        toast.success('Login successful!');
+        return true;
+      }
+      
+      return false;
     } catch (error) {
       console.error('Login error:', error);
+      toast.error('Login failed. Please try again.');
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
-    setIsLoading(true);
     try {
-      // Sign up with auto-confirm for instant login
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -115,24 +118,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error('Signup error:', error);
+        toast.error(error.message || 'Signup failed');
         return false;
       }
 
-      // If user is immediately available (auto-confirm is enabled), return success
-      if (data.user && !data.user.email_confirmed_at) {
-        // For projects with email confirmation disabled, the user will be automatically logged in
-        return true;
-      } else if (data.user && data.user.email_confirmed_at) {
-        // User is confirmed and logged in
+      if (data.user) {
+        toast.success('Account created successfully! Welcome to Veridian Assets. You have received a $100 welcome bonus!');
         return true;
       }
 
-      return true;
+      return false;
     } catch (error) {
       console.error('Signup error:', error);
+      toast.error('Signup failed. Please try again.');
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 
