@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      setIsLoading(true);
+      console.log('Starting login process...');
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -92,6 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       
       if (data.user) {
+        console.log('Login successful');
         toast.success('Login successful!');
         return true;
       }
@@ -101,14 +102,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Login error:', error);
       toast.error('Login failed. Please try again.');
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
     try {
-      setIsLoading(true);
+      console.log('Starting signup process...');
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -127,6 +126,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.user) {
+        console.log('Signup successful');
         toast.success('Account created successfully! Welcome to Veridian Assets. You have received a $100 welcome bonus!');
         return true;
       }
@@ -136,8 +136,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Signup error:', error);
       toast.error('Signup failed. Please try again.');
       return false;
-    } finally {
-      setIsLoading(false);
     }
   };
 

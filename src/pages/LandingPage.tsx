@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowDown, Shield, TrendingUp, Zap, Star, Mail, Phone, MapPin } from 'lucide-react';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-white text-white">
         <div className="absolute inset-0 bg-black/20"></div>
@@ -42,7 +41,7 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-white dark:bg-gray-800">
+      <section id="how-it-works" className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
@@ -78,7 +77,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section id="about" className="py-20 bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50 dark:from-purple-900 dark:via-blue-900 dark:to-purple-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -129,7 +128,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-white dark:bg-gray-800">
+      <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What Our Clients Say</h2>
@@ -180,7 +179,7 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-gray-50 dark:bg-gray-900">
+      <section id="faq" className="py-20 bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50 dark:from-purple-900 dark:via-blue-900 dark:to-gray-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h2>
@@ -212,7 +211,7 @@ const LandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white dark:bg-gray-800">
+      <section id="contact" className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Contact Us</h2>
@@ -248,7 +247,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
