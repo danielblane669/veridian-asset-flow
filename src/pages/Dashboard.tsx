@@ -113,7 +113,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
       <div 
         className="hidden lg:block"
@@ -129,16 +129,16 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className={`flex-1 overflow-auto transition-all duration-300 ${isSidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'}`}>
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-sm">
+        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">V</span>
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Dashboard</span>
+            <span className="text-lg font-bold text-foreground">Dashboard</span>
           </div>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -148,10 +148,10 @@ const Dashboard = () => {
         <div className="p-6">
           {/* Welcome Section */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Welcome back, {user?.fullName}!
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted-foreground">
               Here's an overview of your investment portfolio
             </p>
           </div>
@@ -162,76 +162,76 @@ const Dashboard = () => {
               title="Total Portfolio Value"
               value={user?.totalPortfolio || 0}
               icon={<Wallet className="w-6 h-6" />}
-              gradientColors="from-blue-500 to-blue-600"
+              gradientColors="bg-primary"
             />
             <PortfolioCard
               title="Profit"
               value={user?.profit || 0}
               icon={<TrendingUp className="w-6 h-6" />}
-              gradientColors="from-green-500 to-green-600"
+              gradientColors="bg-secondary"
             />
             <PortfolioCard
               title="Bonus"
               value={user?.bonus || 0}
               icon={<Gift className="w-6 h-6" />}
-              gradientColors="from-yellow-500 to-orange-500"
+              gradientColors="bg-accent"
             />
             <PortfolioCard
               title="Deposit"
               value={user?.deposit || 0}
               icon={<CreditCard className="w-6 h-6" />}
-              gradientColors="from-purple-500 to-purple-600"
+              gradientColors="bg-muted"
             />
           </div>
 
           {/* TradingView Widget */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Market Overview</h2>
+          <div className="bg-card rounded-xl shadow-lg p-6 mb-8">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Market Overview</h2>
             <div className="tradingview-widget-container">
               <div id="tradingview-widget" className="tradingview-widget"></div>
             </div>
           </div>
 
           {/* Recent Transactions */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Recent Transactions</h2>
+          <div className="bg-card rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead className="bg-gray-50 dark:bg-gray-700">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="bg-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Currency
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Date
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody className="bg-card divide-y divide-border">
                   {isLoadingTransactions ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                      <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
                         Loading transactions...
                       </td>
                     </tr>
                   ) : transactions.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                      <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
                         No transactions found
                       </td>
                     </tr>
                   ) : (
                     transactions.map((transaction) => (
-                      <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <tr key={transaction.id} className="hover:bg-muted/50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             transaction.type === 'Deposit' 
@@ -243,10 +243,10 @@ const Dashboard = () => {
                             {transaction.type}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                           ${transaction.amount.toLocaleString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                           {transaction.currency}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -260,7 +260,7 @@ const Dashboard = () => {
                             {transaction.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                           {new Date(transaction.created_at).toLocaleDateString()}
                         </td>
                       </tr>

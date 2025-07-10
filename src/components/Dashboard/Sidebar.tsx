@@ -33,18 +33,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
 
   return (
     <div
-      className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-800 shadow-lg transition-all duration-300 z-50 ${
+      className={`fixed left-0 top-0 h-full bg-card shadow-lg transition-all duration-300 z-50 ${
         isExpanded ? 'w-64' : 'w-16'
       }`}
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="flex items-center h-16 px-4 border-b dark:border-gray-700">
-          <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">V</span>
+        <div className="flex items-center h-16 px-4 border-b border-border">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <span className="text-primary-foreground font-bold text-sm">V</span>
           </div>
           {isExpanded && (
-            <span className="ml-3 text-lg font-bold text-gray-900 dark:text-white">
+            <span className="ml-3 text-lg font-bold text-foreground">
               Veridian Assets
             </span>
           )}
@@ -60,8 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
                 to={item.href}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
         <div className="px-2 pb-4">
           <button
             onClick={toggleTheme}
-            className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             {isDark ? (
               <Sun className="w-5 h-5 flex-shrink-0" />
@@ -87,16 +87,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
         </div>
 
         {/* User Profile */}
-        <div className="border-t dark:border-gray-700 p-4">
+        <div className="border-t border-border p-4">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">
+            <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+              <span className="text-secondary-foreground font-bold text-xs">
                 {user ? getInitials(user.fullName) : 'U'}
               </span>
             </div>
             {isExpanded && (
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.fullName}
                 </p>
               </div>
@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
           {isExpanded && (
             <button
               onClick={logout}
-              className="mt-3 w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              className="mt-3 w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors"
             >
               <LogOut className="w-5 h-5 flex-shrink-0" />
               <span className="ml-3">Logout</span>
