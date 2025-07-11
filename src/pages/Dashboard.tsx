@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Menu, Wallet, TrendingUp, Gift, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -112,32 +113,6 @@ const Dashboard = () => {
     };
   }, []);
 
-  // Fetch user transactions from database
-  const fetchTransactions = async () => {
-    if (!user) return;
-    
-    try {
-      setIsLoadingTransactions(true);
-      const { data, error } = await supabase
-        .from('transactions')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (error) {
-        console.error('Error fetching transactions:', error);
-        return;
-      }
-
-      setTransactions(data || []);
-    } catch (error) {
-      console.error('Error fetching transactions:', error);
-    } finally {
-      setIsLoadingTransactions(false);
-    }
-  };
-
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
@@ -213,17 +188,17 @@ const Dashboard = () => {
           {/* TradingView Widget - Better mobile layout */}
           <div className="bg-card rounded-xl shadow-sm border border-border p-3 sm:p-4 lg:p-6 mb-6 sm:mb-8">
             <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-4">Market Overview</h2>
-            <div className="tradingview-widget-container w-full overflow-hidden">
-              <div id="tradingview-widget" className="tradingview-widget h-[300px] sm:h-[350px] lg:h-[400px] w-full"></div>
+            <div className="tradingview-widget-container w-full overflow-hidden rounded-lg">
+              <div id="tradingview-widget" className="tradingview-widget h-[350px] sm:h-[400px] lg:h-[450px] w-full min-w-0"></div>
             </div>
           </div>
 
-          {/* Recent Transactions - Better spacing */}
+          {/* Recent Transactions - Better spacing and mobile responsiveness */}
           <div className="bg-card rounded-xl shadow-sm border border-border p-3 sm:p-4 lg:p-6">
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
-            <div className="overflow-x-auto">
-              <div className="min-w-full">
-                <table className="min-w-full divide-y divide-border">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-4 sm:mb-6">Recent Transactions</h2>
+            <div className="overflow-x-auto -mx-3 sm:mx-0">
+              <div className="min-w-[600px] sm:min-w-full px-3 sm:px-0">
+                <table className="w-full divide-y divide-border">
                   <thead className="bg-muted/50">
                     <tr>
                       <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -232,13 +207,13 @@ const Dashboard = () => {
                       <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Amount
                       </th>
-                      <th className="hidden sm:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Currency
                       </th>
                       <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="hidden sm:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Date
                       </th>
                     </tr>
@@ -246,13 +221,13 @@ const Dashboard = () => {
                   <tbody className="bg-card divide-y divide-border">
                     {isLoadingTransactions ? (
                       <tr>
-                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-4 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-8 text-center text-muted-foreground">
                           Loading transactions...
                         </td>
                       </tr>
                     ) : transactions.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-4 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-8 text-center text-muted-foreground">
                           No transactions found
                         </td>
                       </tr>
@@ -275,7 +250,7 @@ const Dashboard = () => {
                           <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                             ${transaction.amount.toLocaleString()}
                           </td>
-                          <td className="hidden sm:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {transaction.currency}
                           </td>
                           <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap">
@@ -289,7 +264,7 @@ const Dashboard = () => {
                               {transaction.status}
                             </span>
                           </td>
-                          <td className="hidden sm:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {new Date(transaction.created_at).toLocaleDateString()}
                           </td>
                         </tr>
