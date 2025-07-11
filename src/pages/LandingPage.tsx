@@ -1,295 +1,318 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowDown, Shield, TrendingUp, Zap, Star, Mail, Phone, MapPin } from 'lucide-react';
+import { TrendingUp, Shield, Users, Award, ArrowRight, CheckCircle, Star } from 'lucide-react';
+import Navigation from '../components/Layout/Navigation';
 
 const LandingPage = () => {
+  const features = [
+    {
+      icon: <TrendingUp className="w-8 h-8" />,
+      title: 'Smart Investment Strategies',
+      description: 'AI-powered portfolio management that adapts to market conditions and maximizes your returns.'
+    },
+    {
+      icon: <Shield className="w-8 h-8" />,
+      title: 'Bank-Level Security',
+      description: 'Your investments are protected with enterprise-grade security and insurance coverage.'
+    },
+    {
+      icon: <Users className="w-8 h-8" />,
+      title: 'Expert Advisory',
+      description: 'Access to professional financial advisors and market insights to guide your decisions.'
+    },
+    {
+      icon: <Award className="w-8 h-8" />,
+      title: 'Proven Track Record',
+      description: 'Consistent returns and satisfied clients across global markets and asset classes.'
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: 'Sarah Johnson',
+      role: 'Entrepreneur',
+      content: 'Veridian Assets transformed my financial future. The returns have been consistently impressive.',
+      avatar: '👩‍💼'
+    },
+    {
+      name: 'Michael Chen',
+      role: 'Software Engineer',
+      content: 'Professional service and transparent communication. I trust them with my long-term investments.',
+      avatar: '👨‍💼'
+    },
+    {
+      name: 'Emily Rodriguez',
+      role: 'Doctor',
+      content: 'The AI-driven approach gives me confidence that my portfolio is always optimized.',
+      avatar: '👩‍⚕️'
+    }
+  ];
+
+  const stats = [
+    { number: '$2.5B+', label: 'Assets Under Management' },
+    { number: '15,000+', label: 'Active Investors' },
+    { number: '98%', label: 'Client Satisfaction' },
+    { number: '12%', label: 'Average Annual Return' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 transition-colors duration-300">
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-900 via-purple-800 to-white text-white">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
-              Invest in Crypto with
-              <span className="block bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent">
-                Veridian Assets
-              </span>
+            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+              Invest Smarter with{' '}
+              <span className="text-primary">Veridian Assets</span>
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-purple-100 max-w-3xl mx-auto animate-fade-in">
-              Your trusted partner for cryptocurrency investments. Start building your digital wealth today with our secure and user-friendly platform.
+            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+              Professional investment management powered by AI technology. 
+              Build wealth with confidence through our proven strategies and expert guidance.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-purple-400 to-white text-purple-900 px-8 py-4 rounded-lg font-semibold text-lg hover:from-purple-300 hover:to-gray-100 transition-all duration-300 transform hover:scale-105"
+                className="bg-primary text-primary-foreground px-8 py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-lg inline-flex items-center justify-center"
               >
-                Start Investing Now
+                Start Investing Today
+                <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link
-                to="/login"
-                className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-purple-900 transition-all duration-300"
+                to="#how-it-works"
+                className="border border-border text-foreground px-8 py-4 rounded-lg hover:bg-accent transition-colors font-semibold text-lg"
               >
-                Login to Account
+                Learn More
               </Link>
             </div>
           </div>
         </div>
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ArrowDown className="w-6 h-6 text-white" />
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="about" className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Why Choose Veridian Assets?
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              We combine cutting-edge technology with proven investment strategies 
+              to deliver superior returns for our clients.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <div key={index} className="bg-card p-6 rounded-xl shadow-sm border border-border hover:shadow-md transition-shadow">
+                <div className="text-primary mb-4">{feature.icon}</div>
+                <h3 className="text-xl font-semibold text-card-foreground mb-3">
+                  {feature.title}
+                </h3>
+                <p className="text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">Start your crypto investment journey in three simple steps</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              How It Works
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Getting started with Veridian Assets is simple and straightforward.
+            </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-purple-900">1</span>
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Create Account</h3>
-              <p className="text-gray-600 dark:text-gray-300">Sign up for free and verify your identity to get started with secure crypto investing.</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-purple-900">2</span>
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Fund Your Account</h3>
-              <p className="text-gray-600 dark:text-gray-300">Deposit funds using various cryptocurrencies with minimum deposit of $200.</p>
-            </div>
-            
-            <div className="text-center group">
-              <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-2xl font-bold text-purple-900">3</span>
-              </div>
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Start Investing</h3>
-              <p className="text-gray-600 dark:text-gray-300">Monitor your portfolio growth and withdraw your profits anytime with minimum withdrawal of $1,000.</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50 dark:from-purple-900 dark:via-blue-900 dark:to-purple-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">About Veridian Assets</h2>
-              <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
-                Veridian Assets is a leading cryptocurrency investment platform that provides secure, reliable, and profitable investment opportunities. Our team of experts manages your investments to maximize returns while minimizing risks.
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                1
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Sign Up</h3>
+              <p className="text-muted-foreground">
+                Create your account in minutes with our simple registration process.
               </p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Shield className="w-6 h-6 text-purple-500" />
-                  <span className="text-gray-700 dark:text-gray-300">Bank-level security and encryption</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <TrendingUp className="w-6 h-6 text-purple-500" />
-                  <span className="text-gray-700 dark:text-gray-300">Professional portfolio management</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-6 h-6 text-purple-500" />
-                  <span className="text-gray-700 dark:text-gray-300">Fast and reliable transactions</span>
-                </div>
-              </div>
             </div>
-            <div className="lg:text-center">
-              <div className="bg-gradient-to-br from-purple-500 to-white rounded-2xl p-8 text-purple-900">
-                <h3 className="text-2xl font-bold mb-4">Why Choose Us?</h3>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className="text-3xl font-bold">5+</div>
-                    <div className="text-sm opacity-90">Years Experience</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">10K+</div>
-                    <div className="text-sm opacity-90">Happy Clients</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">99.9%</div>
-                    <div className="text-sm opacity-90">Uptime</div>
-                  </div>
-                  <div>
-                    <div className="text-3xl font-bold">24/7</div>
-                    <div className="text-sm opacity-90">Support</div>
-                  </div>
-                </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                2
               </div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Fund Your Account</h3>
+              <p className="text-muted-foreground">
+                Deposit funds securely using various payment methods including crypto and bank transfers.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                3
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-3">Watch It Grow</h3>
+              <p className="text-muted-foreground">
+                Our AI manages your portfolio automatically while you track your returns in real-time.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">What Our Clients Say</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">Hear from our satisfied investors</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              What Our Clients Say
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of satisfied investors who trust Veridian Assets with their financial future.
+            </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
-                ))}
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-card p-6 rounded-xl shadow-sm border border-border">
+                <div className="flex items-center mb-4">
+                  <div className="text-2xl mr-3">{testimonial.avatar}</div>
+                  <div>
+                    <h4 className="font-semibold text-card-foreground">{testimonial.name}</h4>
+                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  </div>
+                </div>
+                <div className="flex mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-muted-foreground italic">"{testimonial.content}"</p>
               </div>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                "Veridian Assets has transformed my investment portfolio. The returns are excellent and the platform is so easy to use."
-              </p>
-              <div className="font-semibold text-gray-900 dark:text-white">Sarah Johnson</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Investor since 2022</div>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
-                ))}
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                "Professional service and great returns. I've been able to grow my crypto portfolio significantly with their help."
-              </p>
-              <div className="font-semibold text-gray-900 dark:text-white">Mike Chen</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Investor since 2021</div>
-            </div>
-            
-            <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-5 h-5 text-purple-400 fill-current" />
-                ))}
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                "Secure, reliable, and profitable. Veridian Assets is the best crypto investment platform I've used."
-              </p>
-              <div className="font-semibold text-gray-900 dark:text-white">Emily Rodriguez</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Investor since 2023</div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-gradient-to-br from-cyan-50 via-blue-50 to-purple-50 dark:from-purple-900 dark:via-blue-900 dark:to-gray-900">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section id="faq" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">Get answers to common questions</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Frequently Asked Questions
+            </h2>
           </div>
-          
+
           <div className="space-y-6">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">What is the minimum deposit amount?</h3>
-              <p className="text-gray-600 dark:text-gray-300">The minimum deposit amount is $200 USD equivalent in cryptocurrency.</p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">What cryptocurrencies do you accept?</h3>
-              <p className="text-gray-600 dark:text-gray-300">We accept Bitcoin (BTC), Ethereum (ETH), Litecoin (LTC), and XRP for deposits and withdrawals.</p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">How long does withdrawal processing take?</h3>
-              <p className="text-gray-600 dark:text-gray-300">Withdrawal requests are typically reviewed and processed within 24-48 hours.</p>
-            </div>
-            
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Is my investment secure?</h3>
-              <p className="text-gray-600 dark:text-gray-300">Yes, we use bank-level security measures including encryption and cold storage to protect your investments.</p>
-            </div>
+            {[
+              {
+                question: "How does Veridian Assets generate returns?",
+                answer: "We use a combination of AI-driven analysis, diversified portfolios, and expert oversight to identify and capitalize on market opportunities across various asset classes."
+              },
+              {
+                question: "What is the minimum investment amount?",
+                answer: "The minimum investment starts at $1,000, making our platform accessible to a wide range of investors."
+              },
+              {
+                question: "How can I withdraw my funds?",
+                answer: "You can withdraw your funds anytime through our secure platform using bank transfers or cryptocurrency, with processing times typically 1-3 business days."
+              },
+              {
+                question: "Is my investment insured?",
+                answer: "Yes, all client funds are protected through comprehensive insurance coverage and segregated accounts for maximum security."
+              }
+            ].map((faq, index) => (
+              <div key={index} className="bg-card p-6 rounded-xl shadow-sm border border-border">
+                <h3 className="text-lg font-semibold text-card-foreground mb-3 flex items-center">
+                  <CheckCircle className="w-5 h-5 text-primary mr-2" />
+                  {faq.question}
+                </h3>
+                <p className="text-muted-foreground pl-7">{faq.answer}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* CTA Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Ready to Start Your Investment Journey?
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Join Veridian Assets today and take control of your financial future.
+          </p>
+          <Link
+            to="/signup"
+            className="bg-primary text-primary-foreground px-8 py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-lg inline-flex items-center"
+          >
+            Get Started Now
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+      </section>
+
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-cyan-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Contact Us</h2>
-            <p className="text-xl text-gray-600 dark:text-gray-300">Get in touch with our support team</p>
-          </div>
-          
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-8 h-8 text-purple-900" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Email</h3>
-              <p className="text-gray-600 dark:text-gray-300">support@veridianassets.com</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-8 h-8 text-purple-900" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Phone</h3>
-              <p className="text-gray-600 dark:text-gray-300">+1 (555) 123-4567</p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-purple-900" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Address</h3>
-              <p className="text-gray-600 dark:text-gray-300">123 Crypto Street, Digital City, DC 12345</p>
-            </div>
+      <section id="contact" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+            Get In Touch
+          </h2>
+          <p className="text-xl text-muted-foreground mb-8">
+            Have questions? Our team is here to help you make informed investment decisions.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:support@veridiancapital.com"
+              className="bg-card text-card-foreground px-6 py-3 rounded-lg hover:bg-accent transition-colors border border-border"
+            >
+              Email Support
+            </a>
+            <a
+              href="tel:+1-555-0123"
+              className="bg-card text-card-foreground px-6 py-3 rounded-lg hover:bg-accent transition-colors border border-border"
+            >
+              Call Us
+            </a>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 via-purple-900 to-gray-900 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-white rounded-lg flex items-center justify-center">
-                  <span className="text-purple-900 font-bold text-sm">V</span>
-                </div>
-                <span className="text-xl font-bold">Veridian Assets</span>
+      <footer className="bg-card border-t border-border py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">V</span>
               </div>
-              <p className="text-gray-400">Your trusted cryptocurrency investment partner.</p>
+              <span className="text-xl font-bold text-card-foreground">Veridian Assets</span>
             </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><Link to="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link to="/how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-                <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-lg font-semibold mb-4">Connect</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Telegram</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 Veridian Assets. All rights reserved.</p>
+            <p className="text-muted-foreground mb-4">
+              Professional investment management for the digital age.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              © 2024 Veridian Assets. All rights reserved. | Investment advisory services provided by licensed professionals.
+            </p>
           </div>
         </div>
       </footer>

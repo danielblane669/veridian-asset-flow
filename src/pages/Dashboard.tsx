@@ -102,6 +102,7 @@ const Dashboard = () => {
 
     const widgetContainer = document.getElementById('tradingview-widget');
     if (widgetContainer) {
+      widgetContainer.innerHTML = '';
       widgetContainer.appendChild(script);
     }
 
@@ -129,7 +130,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className={`flex-1 overflow-auto transition-all duration-300 ${isSidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'}`}>
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm">
+        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm border-b border-border">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-sm">V</span>
@@ -145,10 +146,10 @@ const Dashboard = () => {
         </div>
 
         {/* Dashboard Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {/* Welcome Section */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
               Welcome back, {user?.fullName}!
             </h1>
             <p className="text-muted-foreground">
@@ -156,120 +157,122 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Portfolio Cards - 2x2 grid on mobile/tablet, 4 columns on desktop */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+          {/* Portfolio Cards - Responsive Grid: 2 cols on mobile, 4 on desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
             <PortfolioCard
               title="Total Portfolio Value"
               value={user?.totalPortfolio || 0}
-              icon={<Wallet className="w-6 h-6" />}
+              icon={<Wallet className="w-5 h-5 sm:w-6 sm:h-6" />}
               gradientColors="bg-primary"
             />
             <PortfolioCard
               title="Profit"
               value={user?.profit || 0}
-              icon={<TrendingUp className="w-6 h-6" />}
+              icon={<TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />}
               gradientColors="bg-secondary"
             />
             <PortfolioCard
               title="Bonus"
               value={user?.bonus || 0}
-              icon={<Gift className="w-6 h-6" />}
+              icon={<Gift className="w-5 h-5 sm:w-6 sm:h-6" />}
               gradientColors="bg-accent"
             />
             <PortfolioCard
               title="Deposit"
               value={user?.deposit || 0}
-              icon={<CreditCard className="w-6 h-6" />}
+              icon={<CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />}
               gradientColors="bg-muted"
             />
           </div>
 
-          {/* TradingView Widget */}
-          <div className="bg-card rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Market Overview</h2>
-            <div className="tradingview-widget-container">
-              <div id="tradingview-widget" className="tradingview-widget"></div>
+          {/* TradingView Widget - Expanded for mobile */}
+          <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6 sm:mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Market Overview</h2>
+            <div className="tradingview-widget-container w-full">
+              <div id="tradingview-widget" className="tradingview-widget min-h-[300px] sm:min-h-[400px]"></div>
             </div>
           </div>
 
-          {/* Recent Transactions */}
-          <div className="bg-card rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border">
-                <thead className="bg-muted">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Currency
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Date
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {isLoadingTransactions ? (
+          {/* Recent Transactions - Better mobile layout */}
+          <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="min-w-full px-4 sm:px-0">
+                <table className="min-w-full divide-y divide-border">
+                  <thead className="bg-muted/50">
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
-                        Loading transactions...
-                      </td>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Type
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Currency
+                      </th>
+                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Date
+                      </th>
                     </tr>
-                  ) : transactions.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-muted-foreground">
-                        No transactions found
-                      </td>
-                    </tr>
-                  ) : (
-                    transactions.map((transaction) => (
-                      <tr key={transaction.id} className="hover:bg-muted/50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            transaction.type === 'Deposit' 
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : transaction.type === 'Withdrawal'
-                              ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                              : transaction.type === 'Profit'
-                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                          }`}>
-                            {transaction.type}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          ${transaction.amount.toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {transaction.currency}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            transaction.status === 'Completed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                              : transaction.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                          }`}>
-                            {transaction.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                          {new Date(transaction.created_at).toLocaleDateString()}
+                  </thead>
+                  <tbody className="bg-card divide-y divide-border">
+                    {isLoadingTransactions ? (
+                      <tr>
+                        <td colSpan={5} className="px-3 sm:px-6 py-4 text-center text-muted-foreground">
+                          Loading transactions...
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : transactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-3 sm:px-6 py-4 text-center text-muted-foreground">
+                          No transactions found
+                        </td>
+                      </tr>
+                    ) : (
+                      transactions.map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-muted/30">
+                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              transaction.type === 'Deposit' 
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                : transaction.type === 'Withdrawal'
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                                : transaction.type === 'Profit'
+                                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                            }`}>
+                              {transaction.type}
+                            </span>
+                          </td>
+                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                            ${transaction.amount.toLocaleString()}
+                          </td>
+                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                            {transaction.currency}
+                          </td>
+                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              transaction.status === 'Completed'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                                : transaction.status === 'Pending'
+                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                                : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                            }`}>
+                              {transaction.status}
+                            </span>
+                          </td>
+                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                            {new Date(transaction.created_at).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

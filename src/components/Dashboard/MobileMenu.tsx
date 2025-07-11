@@ -34,28 +34,29 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 lg:hidden">
+    <>
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      <div 
+        className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+        onClick={onClose}
+      />
       
-      {/* Sidebar */}
-      <div className="fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 translate-x-0">
+      {/* Mobile Menu */}
+      <div className="fixed left-0 top-0 h-full w-64 bg-card border-r border-border shadow-xl z-50 lg:hidden">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between h-16 px-4 border-b dark:border-gray-700">
-            <div className="flex items-center">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
+          <div className="flex items-center justify-between h-16 px-4 border-b border-border">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">V</span>
               </div>
-              <span className="ml-3 text-lg font-bold text-gray-900 dark:text-white">
-                Veridian Assets
-              </span>
+              <span className="text-lg font-bold text-foreground">Veridian Assets</span>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -70,12 +71,12 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
                   onClick={onClose}
                   className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                     isActive
-                      ? 'bg-gradient-to-r from-blue-500 to-green-500 text-white'
-                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  <span className="ml-3">{item.name}</span>
+                  <item.icon className="w-5 h-5 flex-shrink-0 mr-3" />
+                  {item.name}
                 </Link>
               );
             })}
@@ -85,43 +86,46 @@ const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
           <div className="px-2 pb-4">
             <button
               onClick={toggleTheme}
-              className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
             >
               {isDark ? (
-                <Sun className="w-5 h-5 flex-shrink-0" />
+                <Sun className="w-5 h-5 flex-shrink-0 mr-3" />
               ) : (
-                <Moon className="w-5 h-5 flex-shrink-0" />
+                <Moon className="w-5 h-5 flex-shrink-0 mr-3" />
               )}
-              <span className="ml-3">{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+              {isDark ? 'Light Mode' : 'Dark Mode'}
             </button>
           </div>
 
           {/* User Profile */}
-          <div className="border-t dark:border-gray-700 p-4">
+          <div className="border-t border-border p-4">
             <div className="flex items-center mb-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-xs">
                   {user ? getInitials(user.fullName) : 'U'}
                 </span>
               </div>
               <div className="ml-3 flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                <p className="text-sm font-medium text-foreground truncate">
                   {user?.fullName}
                 </p>
               </div>
             </div>
             
             <button
-              onClick={logout}
-              className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              onClick={() => {
+                logout();
+                onClose();
+              }}
+              className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors"
             >
-              <LogOut className="w-5 h-5 flex-shrink-0" />
-              <span className="ml-3">Logout</span>
+              <LogOut className="w-5 h-5 flex-shrink-0 mr-3" />
+              Logout
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

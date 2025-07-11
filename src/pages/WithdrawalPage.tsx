@@ -1,10 +1,23 @@
 
-import React, { useState } from 'react';
-import { Menu, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, CheckCircle, Download } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 import Sidebar from '../components/Dashboard/Sidebar';
 import MobileMenu from '../components/Dashboard/MobileMenu';
+
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  created_at: string;
+  currency: string;
+  hash: string | null;
+}
 
 const WithdrawalPage = () => {
   const { user } = useAuth();
@@ -12,6 +25,8 @@ const WithdrawalPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [withdrawalMethod, setWithdrawalMethod] = useState('crypto');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
   // Crypto withdrawal state
   const [selectedCrypto, setSelectedCrypto] = useState('bitcoin');
@@ -31,6 +46,75 @@ const WithdrawalPage = () => {
     { value: 'xrp', label: 'XRP' },
   ];
 
+  const fetchTransactions = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoadingTransactions(true);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching transactions:', error);
+        return;
+      }
+
+      setTransactions(data || []);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [user]);
+
+  const exportToPDF = () => {
+    if (!user || transactions.length === 0) {
+      toast.error('No transactions to export');
+      return;
+    }
+
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('Transaction History', 20, 20);
+    
+    // Add user info
+    doc.setFontSize(12);
+    doc.text(`Account Holder: ${user.fullName}`, 20, 35);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
+    
+    // Prepare data for table
+    const tableData = transactions.map(transaction => [
+      transaction.type,
+      `$${transaction.amount.toLocaleString()}`,
+      transaction.currency,
+      transaction.status,
+      new Date(transaction.created_at).toLocaleDateString(),
+      transaction.hash || 'N/A'
+    ]);
+
+    // Add table
+    (doc as any).autoTable({
+      head: [['Type', 'Amount', 'Currency', 'Status', 'Date', 'Hash']],
+      body: tableData,
+      startY: 55,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [34, 34, 34] },
+    });
+
+    // Save the PDF
+    doc.save(`${user.fullName}_transactions_${new Date().toISOString().split('T')[0]}.pdf`);
+    toast.success('Transaction history exported successfully!');
+  };
+
   const handleCryptoSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -46,7 +130,6 @@ const WithdrawalPage = () => {
 
     setShowSuccess(true);
     
-    // Auto-redirect after 10 seconds
     setTimeout(() => {
       window.location.href = '/dashboard';
     }, 10000);
@@ -67,7 +150,6 @@ const WithdrawalPage = () => {
 
     setShowSuccess(true);
     
-    // Auto-redirect after 10 seconds
     setTimeout(() => {
       window.location.href = '/dashboard';
     }, 10000);
@@ -75,16 +157,16 @@ const WithdrawalPage = () => {
 
   if (showSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full bg-card rounded-xl shadow-lg border border-border p-6 sm:p-8 text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
             Withdrawal Request Submitted
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-muted-foreground mb-6">
             Your withdrawal is being reviewed. We will communicate via email if the withdrawal is approved or denied.
           </p>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
+          <div className="text-sm text-muted-foreground">
             Redirecting to dashboard in 10 seconds...
           </div>
         </div>
@@ -93,7 +175,7 @@ const WithdrawalPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
       <div 
         className="hidden lg:block"
@@ -109,53 +191,66 @@ const WithdrawalPage = () => {
       {/* Main Content */}
       <div className={`flex-1 overflow-auto transition-all duration-300 ${isSidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'}`}>
         {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 shadow-sm">
+        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm border-b border-border">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">V</span>
             </div>
-            <span className="text-lg font-bold text-gray-900 dark:text-white">Withdrawal</span>
+            <span className="text-lg font-bold text-foreground">Withdrawal</span>
           </div>
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
           >
             <Menu className="w-6 h-6" />
           </button>
         </div>
 
         {/* Withdrawal Content */}
-        <div className="p-6">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Withdraw Funds
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-8">
-              Withdraw your funds via cryptocurrency or bank transfer (Minimum: $1,000)
-            </p>
+        <div className="p-4 sm:p-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Header with Export Button */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                  Withdraw Funds
+                </h1>
+                <p className="text-muted-foreground">
+                  Withdraw your funds via cryptocurrency or bank transfer (Minimum: $1,000)
+                </p>
+              </div>
+              <button
+                onClick={exportToPDF}
+                disabled={isLoadingTransactions || transactions.length === 0}
+                className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+              >
+                <Download className="w-4 h-4" />
+                Export PDF
+              </button>
+            </div>
 
             {/* Method Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
                 Select Withdrawal Method
               </h2>
-              <div className="flex space-x-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
                   onClick={() => setWithdrawalMethod('crypto')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                     withdrawalMethod === 'crypto'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
                   Cryptocurrency
                 </button>
                 <button
                   onClick={() => setWithdrawalMethod('bank')}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors text-sm sm:text-base ${
                     withdrawalMethod === 'bank'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                   }`}
                 >
                   Bank Transfer
@@ -165,19 +260,19 @@ const WithdrawalPage = () => {
 
             {/* Crypto Withdrawal Form */}
             {withdrawalMethod === 'crypto' && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
                   Cryptocurrency Withdrawal
                 </h2>
-                <form onSubmit={handleCryptoSubmit} className="space-y-6">
+                <form onSubmit={handleCryptoSubmit} className="space-y-4 sm:space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Select Cryptocurrency
                     </label>
                     <select
                       value={selectedCrypto}
                       onChange={(e) => setSelectedCrypto(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
                     >
                       {cryptoOptions.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -188,21 +283,21 @@ const WithdrawalPage = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Your Wallet Address
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       value={walletAddress}
                       onChange={(e) => setWalletAddress(e.target.value)}
                       placeholder="Enter your wallet address"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      rows={3}
+                      className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground resize-none"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Withdrawal Amount (USD)
                     </label>
                     <input
@@ -212,14 +307,14 @@ const WithdrawalPage = () => {
                       value={cryptoAmount}
                       onChange={(e) => setCryptoAmount(e.target.value)}
                       placeholder="Minimum $1,000"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
                       required
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 px-4 rounded-md hover:from-blue-700 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-all duration-300"
+                    className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary font-medium transition-colors"
                   >
                     Place Withdrawal Request
                   </button>
@@ -229,41 +324,43 @@ const WithdrawalPage = () => {
 
             {/* Bank Withdrawal Form */}
             {withdrawalMethod === 'bank' && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-4">
                   Bank Transfer Withdrawal
                 </h2>
-                <form onSubmit={handleBankSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Account Number
-                    </label>
-                    <input
-                      type="text"
-                      value={accountNumber}
-                      onChange={(e) => setAccountNumber(e.target.value)}
-                      placeholder="Enter your account number"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      required
-                    />
+                <form onSubmit={handleBankSubmit} className="space-y-4 sm:space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Account Number
+                      </label>
+                      <input
+                        type="text"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="Enter your account number"
+                        className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        Bank Name
+                      </label>
+                      <input
+                        type="text"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="Enter your bank name"
+                        className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Bank Name
-                    </label>
-                    <input
-                      type="text"
-                      value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
-                      placeholder="Enter your bank name"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Full Name
                     </label>
                     <input
@@ -271,13 +368,13 @@ const WithdrawalPage = () => {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Withdrawal Amount (USD)
                     </label>
                     <input
@@ -287,14 +384,14 @@ const WithdrawalPage = () => {
                       value={bankAmount}
                       onChange={(e) => setBankAmount(e.target.value)}
                       placeholder="Minimum $1,000"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
                       required
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 px-4 rounded-md hover:from-blue-700 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-all duration-300"
+                    className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary font-medium transition-colors"
                   >
                     Place Withdrawal Request
                   </button>
