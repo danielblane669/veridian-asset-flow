@@ -33,14 +33,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
 
   return (
     <div
-      className={`fixed left-0 top-0 h-full bg-gradient-to-b from-white via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 shadow-lg transition-all duration-300 z-50 ${
+      className={`fixed left-0 top-0 h-full bg-card border-r border-border shadow-lg transition-all duration-300 z-50 ${
         isExpanded ? 'w-64' : 'w-16'
       }`}
     >
       <div className="flex flex-col h-full">
         {/* Logo */}
-        <div className="flex items-center h-16 px-4 border-b border-border/20">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+        <div className="flex items-center h-16 px-4 border-b border-border">
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-sm">V</span>
           </div>
           {isExpanded && (
@@ -60,8 +60,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
                 to={item.href}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
                   isActive
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                    : 'text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-accent-foreground'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
                 }`}
               >
                 <item.icon className="w-5 h-5 flex-shrink-0" />
@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
         <div className="px-2 pb-4">
           <button
             onClick={toggleTheme}
-            className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-white/50 dark:hover:bg-gray-800/50 hover:text-accent-foreground transition-colors"
+            className="w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
           >
             {isDark ? (
               <Sun className="w-5 h-5 flex-shrink-0" />
@@ -87,10 +87,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
         </div>
 
         {/* User Profile */}
-        <div className="border-t border-border/20 p-4">
+        <div className="border-t border-border p-4">
           <div className="flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xs">
+            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-xs">
                 {user ? getInitials(user.fullName) : 'U'}
               </span>
             </div>

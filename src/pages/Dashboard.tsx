@@ -156,8 +156,8 @@ const Dashboard = () => {
             </p>
           </div>
 
-          {/* Portfolio Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Portfolio Cards - 2x2 grid on mobile/tablet, 4 columns on desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
             <PortfolioCard
               title="Total Portfolio Value"
               value={user?.totalPortfolio || 0}
@@ -238,6 +238,8 @@ const Dashboard = () => {
                               ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                               : transaction.type === 'Withdrawal'
                               ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                              : transaction.type === 'Profit'
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                               : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
                           }`}>
                             {transaction.type}
