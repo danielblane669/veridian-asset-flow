@@ -48,15 +48,15 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 pt-20">
-      <div className="max-w-md w-full space-y-8">
+    <div className="min-h-screen flex items-center justify-center bg-background py-8 px-4 sm:px-6 lg:px-8 pt-20">
+      <div className="max-w-md w-full space-y-6">
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg">
-              <span className="text-primary-foreground font-bold text-2xl">V</span>
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-xl flex items-center justify-center shadow-lg">
+              <span className="text-primary-foreground font-bold text-lg sm:text-2xl">V</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-foreground">
+          <h2 className="mt-4 sm:mt-6 text-2xl sm:text-3xl font-extrabold text-foreground">
             Sign in to your account
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ const LoginPage = () => {
           </p>
         </div>
         
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-6 sm:mt-8 space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground">

@@ -116,23 +116,34 @@
   }
 }
 
-/* TradingView widget responsiveness */
+/* TradingView widget responsiveness - Enhanced for mobile */
 .tradingview-widget-container {
   height: 400px;
   width: 100%;
   min-height: 300px;
+  overflow: hidden;
+  border-radius: 0.75rem;
 }
 
 @media (max-width: 768px) {
   .tradingview-widget-container {
-    height: 350px;
+    height: 300px;
     min-height: 280px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tradingview-widget-container {
+    height: 300px;
+    min-height: 300px;
   }
 }
 
 .tradingview-widget {
   height: 100%;
   width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
 }
 
 /* Scrollbar styling */

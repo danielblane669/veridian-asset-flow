@@ -1,230 +1,266 @@
 
 import React, { useState } from 'react';
-import { Menu, Copy, Upload, CheckCircle } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { ArrowLeft, Copy, CheckCircle, AlertCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import Sidebar from '../components/Dashboard/Sidebar';
-import MobileMenu from '../components/Dashboard/MobileMenu';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../integrations/supabase/client';
 
 const DepositPage = () => {
   const { user } = useAuth();
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [selectedCrypto, setSelectedCrypto] = useState('bitcoin');
   const [amount, setAmount] = useState('');
-  const [receipt, setReceipt] = useState<File | null>(null);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [currency, setCurrency] = useState('BTC');
+  const [selectedMethod, setSelectedMethod] = useState('crypto');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const cryptoOptions = [
-    { value: 'bitcoin', label: 'Bitcoin (BTC)', address: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' },
-    { value: 'ethereum', label: 'Ethereum (ETH)', address: '0x742F2c7b8b8E76BAE9E87C5C8b5F7A7e3b5F8c4d' },
-    { value: 'litecoin', label: 'Litecoin (LTC)', address: 'LTC1234567890abcdefghijklmnopqrstuvwxyz' },
-    { value: 'xrp', label: 'XRP', address: 'rXRP1234567890abcdefghijklmnopqrstuvwxyz' },
-  ];
+  const cryptoAddresses = {
+    BTC: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+    ETH: '0x742d35Cc6bf3B8D3BE87eB7A8b6c1234567890AB',
+    USDT: 'TLa2f6VPqDgRE67v1736s7bJ8Ray5wYjU7',
+    LTC: 'LQoWc8fA2B9oB8cD3E4F5G6H7I8J9K0L1M',
+  };
 
-  const selectedCryptoData = cryptoOptions.find(crypto => crypto.value === selectedCrypto);
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+  const handleCopyAddress = (address: string) => {
+    navigator.clipboard.writeText(address);
     toast.success('Address copied to clipboard!');
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setReceipt(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!amount || parseFloat(amount) < 200) {
-      toast.error('Minimum deposit amount is $200');
-      return;
-    }
-    
-    if (!receipt) {
-      toast.error('Please upload a payment receipt');
+    if (!user) {
+      toast.error('Please log in to make a deposit');
       return;
     }
 
-    setShowSuccess(true);
-    
-    // Auto-redirect after 10 seconds
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 10000);
+    if (!amount || parseFloat(amount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: user.id,
+          type: 'Deposit',
+          amount: parseFloat(amount),
+          currency: currency,
+          status: 'Pending',
+          hash: null
+        });
+
+      if (error) {
+        console.error('Error creating deposit:', error);
+        toast.error('Failed to create deposit request');
+        return;
+      }
+
+      toast.success('Deposit request created successfully! Please send the funds to the provided address.');
+      setAmount('');
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error('An error occurred while processing your request');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (showSuccess) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="max-w-md w-full bg-card rounded-xl shadow-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-4">
-            Deposit Request Submitted
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Your deposit is being reviewed. We will communicate via email if the deposit is approved or denied.
-          </p>
-          <div className="text-sm text-muted-foreground">
-            Redirecting to dashboard in 10 seconds...
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div 
-        className="hidden lg:block"
-        onMouseEnter={() => setIsSidebarExpanded(true)}
-        onMouseLeave={() => setIsSidebarExpanded(false)}
-      >
-        <Sidebar isExpanded={isSidebarExpanded} />
-      </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
-
-      {/* Main Content */}
-      <div className={`flex-1 overflow-auto transition-all duration-300 ${isSidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'}`}>
-        {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">V</span>
-            </div>
-            <span className="text-lg font-bold text-foreground">Deposit</span>
-          </div>
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 pt-20">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center mb-6 sm:mb-8">
+          <Link 
+            to="/dashboard" 
+            className="mr-3 sm:mr-4 p-2 hover:bg-accent rounded-lg transition-colors"
           >
-            <Menu className="w-6 h-6" />
-          </button>
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+          </Link>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Make a Deposit</h1>
+            <p className="text-muted-foreground mt-1">Add funds to your account</p>
+          </div>
         </div>
 
-        {/* Deposit Content */}
-        <div className="p-6">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Deposit Funds
-            </h1>
-            <p className="text-muted-foreground mb-8">
-              Fund your account with cryptocurrency (Minimum: $200)
-            </p>
+        {/* Deposit Form */}
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 lg:p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Amount Input */}
+            <div>
+              <label htmlFor="amount" className="block text-sm font-medium text-foreground mb-2">
+                Amount
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
+                <input
+                  type="number"
+                  id="amount"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full pl-8 pr-3 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground placeholder-muted-foreground"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                  required
+                />
+              </div>
+            </div>
 
-            <div className="bg-card rounded-xl shadow-lg p-6">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Cryptocurrency Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Select Cryptocurrency
-                  </label>
-                  <select
-                    value={selectedCrypto}
-                    onChange={(e) => setSelectedCrypto(e.target.value)}
-                    className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
-                  >
-                    {cryptoOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+            {/* Payment Method */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Payment Method
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('crypto')}
+                  className={`p-4 border rounded-lg text-left transition-colors ${
+                    selectedMethod === 'crypto'
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-border hover:bg-accent'
+                  }`}
+                >
+                  <div className="font-medium">Cryptocurrency</div>
+                  <div className="text-sm text-muted-foreground">BTC, ETH, USDT, LTC</div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedMethod('bank')}
+                  className={`p-4 border rounded-lg text-left transition-colors ${
+                    selectedMethod === 'bank'
+                      ? 'border-primary bg-primary/5 text-primary'
+                      : 'border-border hover:bg-accent'
+                  }`}
+                >
+                  <div className="font-medium">Bank Transfer</div>
+                  <div className="text-sm text-muted-foreground">Wire transfer</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Crypto Options */}
+            {selectedMethod === 'crypto' && (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-3">
+                  Select Cryptocurrency
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {Object.keys(cryptoAddresses).map((crypto) => (
+                    <button
+                      key={crypto}
+                      type="button"
+                      onClick={() => setCurrency(crypto)}
+                      className={`p-3 border rounded-lg text-center transition-colors ${
+                        currency === crypto
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-border hover:bg-accent'
+                      }`}
+                    >
+                      <div className="font-medium">{crypto}</div>
+                    </button>
+                  ))}
                 </div>
 
-                {/* Wallet Address */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Wallet Address
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={selectedCryptoData?.address || ''}
-                      readOnly
-                      className="flex-1 px-3 py-2 border border-border rounded-md shadow-sm bg-muted text-foreground"
-                    />
+                {/* Deposit Address */}
+                <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-foreground">
+                      {currency} Deposit Address
+                    </span>
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(selectedCryptoData?.address || '')}
-                      className="px-3 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+                      onClick={() => handleCopyAddress(cryptoAddresses[currency as keyof typeof cryptoAddresses])}
+                      className="flex items-center text-primary hover:text-primary/80 text-sm"
                     >
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy
                     </button>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Send your {selectedCryptoData?.label} to this address
-                  </p>
+                  <div className="p-3 bg-background border border-border rounded font-mono text-sm break-all">
+                    {cryptoAddresses[currency as keyof typeof cryptoAddresses]}
+                  </div>
                 </div>
 
-                {/* Amount */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Deposit Amount (USD)
-                  </label>
-                  <input
-                    type="number"
-                    min="200"
-                    step="0.01"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Minimum $200"
-                    className="w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
-                    required
-                  />
-                </div>
-
-                {/* Receipt Upload */}
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Payment Receipt
-                  </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-border border-dashed rounded-md">
-                    <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
-                      <div className="flex text-sm text-muted-foreground">
-                        <label
-                          htmlFor="receipt"
-                          className="relative cursor-pointer bg-background rounded-md font-medium text-primary hover:text-primary/90 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary"
-                        >
-                          <span>Upload a file</span>
-                          <input
-                            id="receipt"
-                            name="receipt"
-                            type="file"
-                            accept="image/*,.pdf"
-                            onChange={handleFileChange}
-                            className="sr-only"
-                            required
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        PNG, JPG, PDF up to 10MB
+                {/* Instructions */}
+                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mt-4">
+                  <div className="flex items-start">
+                    <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 mr-3 flex-shrink-0" />
+                    <div className="text-sm">
+                      <p className="font-medium text-blue-900 dark:text-blue-200 mb-2">
+                        Important Deposit Instructions:
                       </p>
-                      {receipt && (
-                        <p className="text-sm text-green-600 dark:text-green-400">
-                          File selected: {receipt.name}
-                        </p>
-                      )}
+                      <ul className="space-y-1 text-blue-800 dark:text-blue-300 list-disc list-inside">
+                        <li>Send only {currency} to this address</li>
+                        <li>Minimum deposit: $50</li>
+                        <li>Deposits are processed after 3 network confirmations</li>
+                        <li>Processing time: 10-30 minutes</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
 
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary font-medium transition-all duration-300"
-                >
-                  Place Deposit Request
-                </button>
-              </form>
+            {/* Bank Transfer Info */}
+            {selectedMethod === 'bank' && (
+              <div className="bg-muted/30 rounded-lg p-4">
+                <h3 className="font-medium text-foreground mb-3">Bank Transfer Details</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Bank Name:</span>
+                    <span className="text-foreground">Veridian Bank Ltd.</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Account Number:</span>
+                    <span className="text-foreground">1234567890</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Routing Number:</span>
+                    <span className="text-foreground">021000021</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">SWIFT Code:</span>
+                    <span className="text-foreground">VRDNUSNY</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || !amount}
+              className="w-full bg-primary text-primary-foreground py-3 px-4 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                  Processing...
+                </div>
+              ) : (
+                'Create Deposit Request'
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Security Notice */}
+        <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mt-6">
+          <div className="flex items-start">
+            <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 mr-3 flex-shrink-0" />
+            <div className="text-sm">
+              <p className="font-medium text-green-900 dark:text-green-200 mb-1">
+                Secure & Insured
+              </p>
+              <p className="text-green-800 dark:text-green-300">
+                Your deposits are protected by bank-level security and FDIC insurance up to $250,000.
+              </p>
             </div>
           </div>
         </div>

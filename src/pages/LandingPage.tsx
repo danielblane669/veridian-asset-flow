@@ -50,7 +50,7 @@ const LandingPage = () => {
   ];
 
   const stats = [
-    { number: '$2.5B+', label: 'Assets Under Management' },
+    { number: '$1.6B+', label: 'Assets Under Management' },
     { number: '15,000+', label: 'Active Investors' },
     { number: '98%', label: 'Client Satisfaction' },
     { number: '12%', label: 'Average Annual Return' }
@@ -60,29 +60,29 @@ const LandingPage = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      {/* Hero Section */}
-      <section className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
+      {/* Hero Section - Enhanced for better mobile display */}
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-16 sm:pb-20 lg:pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 sm:mb-8 leading-tight">
               Invest Smarter with{' '}
               <span className="text-primary">Veridian Assets</span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground mb-8 sm:mb-10 lg:mb-12 max-w-4xl mx-auto leading-relaxed">
               Professional investment management powered by AI technology. 
               Build wealth with confidence through our proven strategies and expert guidance.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
               <Link
                 to="/signup"
-                className="bg-primary text-primary-foreground px-8 py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-lg inline-flex items-center justify-center"
+                className="w-full sm:w-auto bg-primary text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-base sm:text-lg inline-flex items-center justify-center"
               >
                 Start Investing Today
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link
                 to="#how-it-works"
-                className="border border-border text-foreground px-8 py-4 rounded-lg hover:bg-accent transition-colors font-semibold text-lg"
+                className="w-full sm:w-auto border border-border text-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-accent transition-colors font-semibold text-base sm:text-lg"
               >
                 Learn More
               </Link>
@@ -92,15 +92,15 @@ const LandingPage = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-12 sm:py-16 lg:py-20 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-2">
+                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
                   {stat.number}
                 </div>
-                <div className="text-muted-foreground">{stat.label}</div>
+                <div className="text-sm sm:text-base text-muted-foreground">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -108,13 +108,13 @@ const LandingPage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="about" className="py-20 px-4 sm:px-6 lg:px-8">
+      <section id="about" className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
               Why Choose Veridian Assets?
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
               We combine cutting-edge technology with proven investment strategies 
               to deliver superior returns for our clients.
             </p>
@@ -135,13 +135,13 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+      <section id="how-it-works" className="py-16 sm:py-20 lg:py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
               Getting started with Veridian Assets is simple and straightforward.
             </p>
           </div>
@@ -179,13 +179,13 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
               What Our Clients Say
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
               Join thousands of satisfied investors who trust Veridian Assets with their financial future.
             </p>
           </div>
@@ -213,10 +213,10 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section id="faq" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+      <section id="faq" className="py-16 sm:py-20 lg:py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
               Frequently Asked Questions
             </h2>
           </div>
@@ -253,17 +253,17 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Ready to Start Your Investment Journey?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-lg sm:text-xl text-muted-foreground mb-8">
             Join Veridian Assets today and take control of your financial future.
           </p>
           <Link
             to="/signup"
-            className="bg-primary text-primary-foreground px-8 py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-lg inline-flex items-center"
+            className="bg-primary text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 rounded-lg hover:bg-primary/90 transition-colors font-semibold text-base sm:text-lg inline-flex items-center"
           >
             Get Started Now
             <ArrowRight className="ml-2 w-5 h-5" />
@@ -272,12 +272,12 @@ const LandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-muted/30 px-4 sm:px-6 lg:px-8">
+      <section id="contact" className="py-16 sm:py-20 lg:py-24 bg-muted/30 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-4">
             Get In Touch
           </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-lg sm:text-xl text-muted-foreground mb-8">
             Have questions? Our team is here to help you make informed investment decisions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

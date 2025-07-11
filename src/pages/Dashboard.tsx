@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, Wallet, TrendingUp, Gift, CreditCard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -113,6 +112,32 @@ const Dashboard = () => {
     };
   }, []);
 
+  // Fetch user transactions from database
+  const fetchTransactions = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoadingTransactions(true);
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) {
+        console.error('Error fetching transactions:', error);
+        return;
+      }
+
+      setTransactions(data || []);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    } finally {
+      setIsLoadingTransactions(false);
+    }
+  };
+
   return (
     <div className="flex h-screen bg-background">
       {/* Desktop Sidebar */}
@@ -162,58 +187,58 @@ const Dashboard = () => {
             <PortfolioCard
               title="Total Portfolio Value"
               value={user?.totalPortfolio || 0}
-              icon={<Wallet className="w-5 h-5 sm:w-6 sm:h-6" />}
+              icon={<Wallet className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
               gradientColors="bg-primary"
             />
             <PortfolioCard
               title="Profit"
               value={user?.profit || 0}
-              icon={<TrendingUp className="w-5 h-5 sm:w-6 sm:h-6" />}
-              gradientColors="bg-secondary"
+              icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+              gradientColors="bg-primary"
             />
             <PortfolioCard
               title="Bonus"
               value={user?.bonus || 0}
-              icon={<Gift className="w-5 h-5 sm:w-6 sm:h-6" />}
-              gradientColors="bg-accent"
+              icon={<Gift className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+              gradientColors="bg-primary"
             />
             <PortfolioCard
               title="Deposit"
               value={user?.deposit || 0}
-              icon={<CreditCard className="w-5 h-5 sm:w-6 sm:h-6" />}
-              gradientColors="bg-muted"
+              icon={<CreditCard className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />}
+              gradientColors="bg-primary"
             />
           </div>
 
-          {/* TradingView Widget - Expanded for mobile */}
-          <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6 sm:mb-8">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Market Overview</h2>
-            <div className="tradingview-widget-container w-full">
-              <div id="tradingview-widget" className="tradingview-widget min-h-[300px] sm:min-h-[400px]"></div>
+          {/* TradingView Widget - Better mobile layout */}
+          <div className="bg-card rounded-xl shadow-sm border border-border p-3 sm:p-4 lg:p-6 mb-6 sm:mb-8">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-4">Market Overview</h2>
+            <div className="tradingview-widget-container w-full overflow-hidden">
+              <div id="tradingview-widget" className="tradingview-widget h-[300px] sm:h-[350px] lg:h-[400px] w-full"></div>
             </div>
           </div>
 
-          {/* Recent Transactions - Better mobile layout */}
-          <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <div className="min-w-full px-4 sm:px-0">
+          {/* Recent Transactions - Better spacing */}
+          <div className="bg-card rounded-xl shadow-sm border border-border p-3 sm:p-4 lg:p-6">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-4">Recent Transactions</h2>
+            <div className="overflow-x-auto">
+              <div className="min-w-full">
                 <table className="min-w-full divide-y divide-border">
                   <thead className="bg-muted/50">
                     <tr>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Type
                       </th>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Amount
                       </th>
-                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="hidden sm:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Currency
                       </th>
-                      <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      <th className="hidden sm:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                         Date
                       </th>
                     </tr>
@@ -221,20 +246,20 @@ const Dashboard = () => {
                   <tbody className="bg-card divide-y divide-border">
                     {isLoadingTransactions ? (
                       <tr>
-                        <td colSpan={5} className="px-3 sm:px-6 py-4 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-4 text-center text-muted-foreground">
                           Loading transactions...
                         </td>
                       </tr>
                     ) : transactions.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-3 sm:px-6 py-4 text-center text-muted-foreground">
+                        <td colSpan={5} className="px-3 sm:px-4 lg:px-6 py-4 text-center text-muted-foreground">
                           No transactions found
                         </td>
                       </tr>
                     ) : (
                       transactions.map((transaction) => (
                         <tr key={transaction.id} className="hover:bg-muted/30">
-                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               transaction.type === 'Deposit' 
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
@@ -247,13 +272,13 @@ const Dashboard = () => {
                               {transaction.type}
                             </span>
                           </td>
-                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                          <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                             ${transaction.amount.toLocaleString()}
                           </td>
-                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          <td className="hidden sm:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {transaction.currency}
                           </td>
-                          <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
+                          <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap">
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               transaction.status === 'Completed'
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
@@ -264,7 +289,7 @@ const Dashboard = () => {
                               {transaction.status}
                             </span>
                           </td>
-                          <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          <td className="hidden sm:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
                             {new Date(transaction.created_at).toLocaleDateString()}
                           </td>
                         </tr>

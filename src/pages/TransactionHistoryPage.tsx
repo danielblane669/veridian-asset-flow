@@ -1,12 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
-import { Menu, Filter, Download } from 'lucide-react';
+import { ArrowLeft, Download, Filter, Search, Calendar } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../integrations/supabase/client';
-import Sidebar from '../components/Dashboard/Sidebar';
-import MobileMenu from '../components/Dashboard/MobileMenu';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 interface Transaction {
   id: string;
@@ -20,43 +18,95 @@ interface Transaction {
 
 const TransactionHistoryPage = () => {
   const { user } = useAuth();
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [filterType, setFilterType] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      fetchTransactions();
-    }
-  }, [user]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [typeFilter, setTypeFilter] = useState('All');
+  const [dateFilter, setDateFilter] = useState('All');
 
   const fetchTransactions = async () => {
+    if (!user) return;
+    
     try {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching transactions:', error);
-      } else {
-        setTransactions(data || []);
+        return;
       }
+
+      setTransactions(data || []);
+      setFilteredTransactions(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error fetching transactions:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const filteredTransactions = transactions.filter(transaction => {
-    const typeMatch = filterType === 'all' || transaction.type.toLowerCase() === filterType;
-    const statusMatch = filterStatus === 'all' || transaction.status.toLowerCase() === filterStatus;
-    return typeMatch && statusMatch;
-  });
+  useEffect(() => {
+    fetchTransactions();
+  }, [user]);
+
+  useEffect(() => {
+    let filtered = transactions;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(
+        transaction =>
+          transaction.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          transaction.currency.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          transaction.hash?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Status filter
+    if (statusFilter !== 'All') {
+      filtered = filtered.filter(transaction => transaction.status === statusFilter);
+    }
+
+    // Type filter
+    if (typeFilter !== 'All') {
+      filtered = filtered.filter(transaction => transaction.type === typeFilter);
+    }
+
+    // Date filter
+    if (dateFilter !== 'All') {
+      const now = new Date();
+      const filterDate = new Date();
+      
+      switch (dateFilter) {
+        case 'Today':
+          filterDate.setHours(0, 0, 0, 0);
+          break;
+        case 'This Week':
+          filterDate.setDate(now.getDate() - 7);
+          break;
+        case 'This Month':
+          filterDate.setMonth(now.getMonth() - 1);
+          break;
+        case 'This Year':
+          filterDate.setFullYear(now.getFullYear() - 1);
+          break;
+      }
+
+      if (dateFilter !== 'All') {
+        filtered = filtered.filter(transaction => 
+          new Date(transaction.created_at) >= filterDate
+        );
+      }
+    }
+
+    setFilteredTransactions(filtered);
+  }, [transactions, searchTerm, statusFilter, typeFilter, dateFilter]);
 
   const exportToPDF = () => {
     const doc = new jsPDF();
@@ -67,8 +117,8 @@ const TransactionHistoryPage = () => {
     
     // Add user info
     doc.setFontSize(12);
-    doc.text(`User: ${user?.fullName || 'N/A'}`, 20, 35);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 20, 45);
+    doc.text(`Account: ${user?.email || 'N/A'}`, 20, 35);
+    doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 45);
     
     // Prepare table data
     const tableData = filteredTransactions.map(transaction => [
@@ -81,211 +131,186 @@ const TransactionHistoryPage = () => {
     ]);
     
     // Add table
-    (doc as any).autoTable({
-      head: [['Type', 'Amount', 'Currency', 'Status', 'Date', 'Transaction ID']],
+    autoTable(doc, {
+      head: [['Type', 'Amount', 'Currency', 'Status', 'Date', 'Hash']],
       body: tableData,
       startY: 55,
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [128, 90, 213], // Purple color
-        textColor: [255, 255, 255],
-      },
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [34, 197, 94] }
     });
     
     // Save the PDF
-    doc.save(`transaction-history-${new Date().toISOString().split('T')[0]}.pdf`);
+    doc.save('transaction-history.pdf');
   };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Completed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'Denied':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
-
-  const getTypeColor = (type: string) => {
-    switch (type) {
-      case 'Deposit':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'Withdrawal':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'Bonus':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'Profit':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Desktop Sidebar */}
-      <div 
-        className="hidden lg:block"
-        onMouseEnter={() => setIsSidebarExpanded(true)}
-        onMouseLeave={() => setIsSidebarExpanded(false)}
-      >
-        <Sidebar isExpanded={isSidebarExpanded} />
-      </div>
-
-      {/* Mobile Menu */}
-      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
-
-      {/* Main Content */}
-      <div className={`flex-1 overflow-auto transition-all duration-300 ${isSidebarExpanded ? 'lg:ml-64' : 'lg:ml-16'}`}>
-        {/* Mobile Header */}
-        <div className="lg:hidden flex items-center justify-between p-4 bg-card shadow-sm">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">V</span>
+    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8 pt-20">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 sm:mb-8">
+          <div className="flex items-center mb-4 sm:mb-0">
+            <Link 
+              to="/dashboard" 
+              className="mr-3 sm:mr-4 p-2 hover:bg-accent rounded-lg transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-foreground" />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Transaction History</h1>
+              <p className="text-muted-foreground mt-1">View all your transactions</p>
             </div>
-            <span className="text-lg font-bold text-foreground">Transactions</span>
           </div>
+          
           <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="p-2 text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg"
+            onClick={exportToPDF}
+            className="flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
-            <Menu className="w-6 h-6" />
+            <Download className="w-4 h-4 mr-2" />
+            Export PDF
           </button>
         </div>
 
-        {/* Transaction History Content */}
-        <div className="p-4 sm:p-6">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-              Transaction History
-            </h1>
-            <p className="text-muted-foreground">
-              View all your deposits, withdrawals, bonuses, and profits
-            </p>
-          </div>
-
-          {/* Filters and Actions */}
-          <div className="bg-card rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <div className="flex items-center space-x-2">
-                  <Filter className="w-5 h-5 text-muted-foreground" />
-                  <select
-                    value={filterType}
-                    onChange={(e) => setFilterType(e.target.value)}
-                    className="px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground text-sm"
-                  >
-                    <option value="all">All Types</option>
-                    <option value="deposit">Deposits</option>
-                    <option value="withdrawal">Withdrawals</option>
-                    <option value="bonus">Bonuses</option>
-                    <option value="profit">Profits</option>
-                  </select>
-                </div>
-                
-                <select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground text-sm"
-                >
-                  <option value="all">All Status</option>
-                  <option value="completed">Completed</option>
-                  <option value="pending">Pending</option>
-                  <option value="denied">Denied</option>
-                </select>
-              </div>
-              
-              <button 
-                onClick={exportToPDF}
-                className="flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-sm"
-              >
-                <Download className="w-4 h-4" />
-                <span>Export PDF</span>
-              </button>
+        {/* Filters */}
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <input
+                type="text"
+                placeholder="Search transactions..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground placeholder-muted-foreground"
+              />
             </div>
-          </div>
 
-          {/* Transactions Table */}
-          <div className="bg-card rounded-xl shadow-lg overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-border">
-                <thead className="bg-muted">
+            {/* Status Filter */}
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
+            >
+              <option value="All">All Status</option>
+              <option value="Completed">Completed</option>
+              <option value="Pending">Pending</option>
+              <option value="Failed">Failed</option>
+            </select>
+
+            {/* Type Filter */}
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
+            >
+              <option value="All">All Types</option>
+              <option value="Deposit">Deposit</option>
+              <option value="Withdrawal">Withdrawal</option>
+              <option value="Profit">Profit</option>
+              <option value="Bonus">Bonus</option>
+            </select>
+
+            {/* Date Filter */}
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-background text-foreground"
+            >
+              <option value="All">All Time</option>
+              <option value="Today">Today</option>
+              <option value="This Week">This Week</option>
+              <option value="This Month">This Month</option>
+              <option value="This Year">This Year</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Transactions Table */}
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Amount
+                  </th>
+                  <th className="hidden sm:table-cell px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Currency
+                  </th>
+                  <th className="px-3 sm:px-4 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Hash
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-card divide-y divide-border">
+                {isLoading ? (
                   <tr>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Amount
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Currency
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Date
-                    </th>
-                    <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      Transaction ID
-                    </th>
+                    <td colSpan={6} className="px-3 sm:px-4 lg:px-6 py-8 text-center text-muted-foreground">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mr-3"></div>
+                        Loading transactions...
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-card divide-y divide-border">
-                  {filteredTransactions.map((transaction) => (
-                    <tr key={transaction.id} className="hover:bg-muted/50">
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(transaction.type)}`}>
+                ) : filteredTransactions.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-3 sm:px-4 lg:px-6 py-8 text-center text-muted-foreground">
+                      No transactions found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredTransactions.map((transaction) => (
+                    <tr key={transaction.id} className="hover:bg-muted/30">
+                      <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          transaction.type === 'Deposit' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                            : transaction.type === 'Withdrawal'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                            : transaction.type === 'Profit'
+                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                        }`}>
                           {transaction.type}
                         </span>
                       </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                        ${Number(transaction.amount).toLocaleString()}
+                      <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        ${transaction.amount.toLocaleString()}
                       </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      <td className="hidden sm:table-cell px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {transaction.currency}
                       </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
+                      <td className="px-3 sm:px-4 lg:px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          transaction.status === 'Completed'
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+                            : transaction.status === 'Pending'
+                            ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
+                        }`}>
                           {transaction.status}
                         </span>
                       </td>
-                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                        <div>
-                          <div>{new Date(transaction.created_at).toLocaleDateString()}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {new Date(transaction.created_at).toLocaleTimeString()}
-                          </div>
-                        </div>
+                      <td className="hidden lg:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                        {new Date(transaction.created_at).toLocaleDateString()}
                       </td>
-                      <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-foreground font-mono">
+                      <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-sm text-muted-foreground font-mono max-w-xs truncate">
                         {transaction.hash || 'N/A'}
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {filteredTransactions.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No transactions found matching your filters.</p>
-              </div>
-            )}
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

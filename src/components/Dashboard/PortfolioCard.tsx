@@ -20,9 +20,9 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ title, value, icon, gradi
   };
 
   return (
-    <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 hover:shadow-md transition-shadow">
+    <div className="bg-card rounded-xl shadow-sm border border-border p-3 sm:p-4 lg:p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-3">
-        <div className={`${gradientColors} text-primary-foreground p-2 sm:p-3 rounded-lg shadow-sm`}>
+        <div className="bg-primary text-primary-foreground p-2 sm:p-3 rounded-lg shadow-sm">
           {icon}
         </div>
       </div>
@@ -31,7 +31,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ title, value, icon, gradi
         <h3 className="text-xs sm:text-sm font-medium text-muted-foreground line-clamp-2 leading-tight">
           {title}
         </h3>
-        <p className="text-lg sm:text-2xl font-bold text-foreground break-words">
+        <p className="text-base sm:text-lg lg:text-2xl font-bold text-foreground break-words">
           {formatValue(value)}
         </p>
       </div>

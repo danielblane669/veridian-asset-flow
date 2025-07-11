@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -9,6 +9,9 @@ const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isDark, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const location = useLocation();
+
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
