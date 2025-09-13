@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isExpanded, onToggle }) => {
           {isExpanded && (
             <button
               onClick={logout}
-              className="mt-3 w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+              className="mt-3 w-full group flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-600/10 hover:text-red-700 transition-colors"
             >
               <LogOut className="w-5 h-5 flex-shrink-0" />
               <span className="ml-3">Logout</span>

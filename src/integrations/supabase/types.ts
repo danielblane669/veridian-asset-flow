@@ -7,41 +7,53 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
       profiles: {
         Row: {
           bonus: number | null
+          country: string | null
           created_at: string | null
+          date_of_birth: string | null
           deposit: number | null
           full_name: string
           id: string
+          phone_number: string | null
           profit: number | null
+          sex: string | null
           total_portfolio: number | null
           updated_at: string | null
         }
         Insert: {
           bonus?: number | null
+          country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           deposit?: number | null
           full_name: string
           id: string
+          phone_number?: string | null
           profit?: number | null
+          sex?: string | null
           total_portfolio?: number | null
           updated_at?: string | null
         }
         Update: {
           bonus?: number | null
+          country?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
           deposit?: number | null
           full_name?: string
           id?: string
+          phone_number?: string | null
           profit?: number | null
+          sex?: string | null
           total_portfolio?: number | null
           updated_at?: string | null
         }
@@ -54,6 +66,7 @@ export type Database = {
           currency: string
           hash: string | null
           id: string
+          receipt_url: string | null
           status: string
           type: string
           user_id: string
@@ -64,6 +77,7 @@ export type Database = {
           currency?: string
           hash?: string | null
           id?: string
+          receipt_url?: string | null
           status?: string
           type: string
           user_id: string
@@ -74,6 +88,7 @@ export type Database = {
           currency?: string
           hash?: string | null
           id?: string
+          receipt_url?: string | null
           status?: string
           type?: string
           user_id?: string

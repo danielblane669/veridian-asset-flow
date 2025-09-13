@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, SignupData } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 
 const SignupPage = () => {
@@ -81,8 +81,18 @@ const SignupPage = () => {
     setIsSubmitting(true);
     
     try {
+      const signupData: SignupData = {
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+        phoneNumber: phoneNumber.trim(),
+        country: country.trim(),
+        sex: sex.trim(),
+        dateOfBirth: dateOfBirth.trim(),
+      };
+      
       console.log('Submitting signup form...');
-      const success = await signup(fullName.trim(), email.trim(), password);
+      const success = await signup(signupData);
       
       if (success) {
         console.log('Signup successful, navigating to dashboard');

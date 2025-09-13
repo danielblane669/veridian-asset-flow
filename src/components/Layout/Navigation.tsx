@@ -36,7 +36,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {!user && (
+            {(!user && !isAuthPage) && (
               <>
                 <button 
                   onClick={() => scrollToSection('about')}
@@ -67,9 +67,10 @@ const Navigation = () => {
             
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-muted hover:bg-accent transition-colors shadow-sm"
+              className="p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-colors border border-border"
+              aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-muted-foreground" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
 
             {!user && (
@@ -94,9 +95,10 @@ const Navigation = () => {
           <div className="md:hidden flex items-center space-x-2">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-muted hover:bg-accent transition-colors shadow-sm"
+              className="p-2 rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-colors border border-border"
+              aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-muted-foreground" />}
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
             
             <button
@@ -112,7 +114,7 @@ const Navigation = () => {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-background/95 backdrop-blur-sm border-t border-border rounded-b-lg">
-              {!user && (
+              {(!user && !isAuthPage) && (
                 <>
                   <button
                     onClick={() => scrollToSection('about')}
@@ -138,9 +140,13 @@ const Navigation = () => {
                   >
                     Contact
                   </button>
+                </>
+              )}
+              {!user && (
+                <>
                   <Link
                     to="/login"
-                    className="block px-3 py-2 text-primary hover:text-primary/80 font-medium transition-colors"
+                    className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors block text-center mx-3 font-medium"
                     onClick={() => setIsOpen(false)}
                   >
                     Login

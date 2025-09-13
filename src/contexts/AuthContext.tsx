@@ -14,11 +14,21 @@ interface User {
   deposit: number;
 }
 
+export interface SignupData {
+  fullName: string;
+  email: string;
+  password: string;
+  phoneNumber: string;
+  country: string;
+  sex: string;
+  dateOfBirth: string;
+}
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   login: (email: string, password: string) => Promise<boolean>;
-  signup: (fullName: string, email: string, password: string) => Promise<boolean>;
+  signup: (signupData: SignupData) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -140,17 +150,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signup = async (fullName: string, email: string, password: string): Promise<boolean> => {
+  const signup = async (signupData: SignupData): Promise<boolean> => {
     try {
       setIsLoading(true);
-      console.log('Attempting signup for:', email);
+      console.log('Attempting signup for:', signupData.email);
       
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
+        email: signupData.email.trim(),
+        password: signupData.password,
         options: {
           data: {
-            full_name: fullName.trim(),
+            full_name: signupData.fullName.trim(),
+            phone_number: signupData.phoneNumber,
+            country: signupData.country,
+            sex: signupData.sex,
+            date_of_birth: signupData.dateOfBirth,
           },
           emailRedirectTo: `${window.location.origin}/dashboard`
         },
@@ -162,15 +176,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
       }
 
-      if (data.user) {
+      if (data.user && data.session) {
         console.log('Signup successful for user:', data.user.id);
         
-        // Check if email confirmation is needed
-        if (!data.session) {
-          toast.success('Please check your email to confirm your account!');
-        } else {
-          toast.success('Account created successfully! Welcome to Veridian Assets.');
+        // Update the profile with additional fields
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            phone_number: signupData.phoneNumber,
+            country: signupData.country,
+            sex: signupData.sex,
+            date_of_birth: signupData.dateOfBirth,
+          })
+          .eq('id', data.user.id);
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
         }
+
+        toast.success('Account created successfully! Welcome to Veridian Assets.');
+        return true;
+      } else if (data.user && !data.session) {
+        toast.success('Please check your email to confirm your account!');
         return true;
       }
 
